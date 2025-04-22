@@ -1,105 +1,125 @@
-# Sentiment-Based Chat Agent
+# 🧠 Sentiment-Based Chat Agent
 
-## Overview
-This repository contains an n8n workflow that implements a sentiment-based chat agent. The agent analyzes the sentiment of incoming user messages and adapts its response style accordingly, creating a more personalized and contextually appropriate conversational experience.
+[![n8n](https://img.shields.io/badge/Built%20with-n8n-0D1117?style=flat&logo=n8n)](https://n8n.io/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-4B8BBE?style=flat&logo=openai)](https://platform.openai.com/)
+[![Langchain](https://img.shields.io/badge/Powered%20by-LangChain-EC4E4E.svg)](https://www.langchain.com/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-## Components
+---
 
-### 1. Trigger: When Chat Message Received
-- **Type:** `@n8n/n8n-nodes-langchain.chatTrigger`
-- **Function:** Initiates the workflow when a new chat message is received.
-- **Configuration:** Set up as a webhook with public access for external connections.
+## 📋 Description
 
-### 2. Sentiment Analysis
-- **Type:** `@n8n/n8n-nodes-langchain.sentimentAnalysis`
-- **Function:** Analyzes the emotional tone of the incoming message.
-- **Input:** User's chat message.
-- **Output:** Categorizes the message as "Positive", "Neutral", or "Negative".
-- **Dependencies:** Uses OpenAI Chat Model (GPT-4o-mini) for sentiment classification.
+This project implements a **sentiment-based message analysis agent** using `n8n` and OpenAI's GPT-4o-mini.  
+⚠️ Unlike traditional chatbots, this agent is **not meant for sustained conversation**. Instead, it analyzes individual user messages and provides a **single, context-aware, emotionally-aligned response**.
 
-### 3. Edit Fields
-- **Type:** `n8n-nodes-base.set`
-- **Function:** Dynamically generates a system message based on the detected sentiment.
-- **Configuration:**
-  - For **Positive** sentiment: Creates a cheerful, urban, and energetic response style using colloquial expressions like "qué bueno, mi rey", "me alegra pila, socio".
-  - For **Negative** sentiment: Adopts a firmer, direct tone that maintains respect but doesn't tolerate disrespect, using street-style language.
-  - For **Neutral** sentiment: Uses a balanced approach similar to the negative case.
+It's ideal for use cases where identifying and responding to a user's emotional tone is more important than maintaining ongoing chat sessions.
 
-### 4. AI Agent
-- **Type:** `@n8n/n8n-nodes-langchain.agent`
-- **Function:** Processes the user input with the appropriate system message.
-- **Dependencies:**
-  - OpenAI Chat Model1 (GPT-4o-mini) for generating responses.
-  - Simple Memory for maintaining conversation context.
+---
 
-### 5. OpenAI Chat Models
-- **Type:** `@n8n/n8n-nodes-langchain.lmChatOpenAi`
-- **Models Used:** gpt-4o-mini
-- **Instances:**
-  - **OpenAI Chat Model:** Powers the sentiment analysis.
-  - **OpenAI Chat Model1:** Powers the main AI agent responses.
+## ✨ Key Features
 
-### 6. Simple Memory
-- **Type:** `@n8n/n8n-nodes-langchain.memoryBufferWindow`
-- **Function:** Maintains conversation history and context to ensure coherent, contextually relevant responses throughout the interaction.
+- 🔍 **Sentiment Analysis**: Classifies input messages as *Positive*, *Neutral*, or *Negative* using OpenAI.
+- 🧠 **Tone-Adaptive Responses**: Generates a structured, empathetic response aligned with the detected sentiment.
+- 🧰 **Non-Conversational Agent**: Responds once per input message—does not continue chatting.
+- 💡 **Structured Outputs**: Clearly presents emotional insights, tailored replies, and suggested actions.
+- 🌍 **Multilingual Adaptability**: Currently optimized for Spanish, easily extendable to other languages.
 
-## Workflow Logic
+---
 
-1. The workflow begins when a user sends a message through the chat interface.
-2. The message is analyzed for sentiment using OpenAI's language model.
-3. Based on the detected sentiment (Positive, Neutral, or Negative), a specific system message is generated.
-4. The AI Agent receives the user message along with the appropriate system message.
-5. The agent, powered by GPT-4o-mini, generates a contextually appropriate response that matches the tone dictated by the detected sentiment.
-6. The Simple Memory component maintains conversation history for context in future interactions.
+## 🛠️ Workflow Components
 
-## Requirements
+| Component             | Description                                                                 |
+|-----------------------|-----------------------------------------------------------------------------|
+| **Trigger**           | Starts the workflow when a message is received (`chatTrigger` webhook).     |
+| **Sentiment Analysis**| Classifies sentiment using `OpenAI Chat Model` via LangChain node.          |
+| **Edit Fields**       | Generates a dynamic system prompt based on detected sentiment.              |
+| **AI Agent**          | Produces the final output using OpenAI + memory context.                    |
+| **OpenAI Models**     | GPT-4o-mini used for both sentiment analysis and final message generation.  |
+| **Simple Memory**     | Stores minimal context if future expansion is needed.                       |
 
-- n8n instance (version compatible with all nodes used)
-- OpenAI API key with access to GPT-4o-mini model
-- Webhook configuration for receiving chat messages
+---
 
-## Installation
+## 🧠 Workflow Logic
 
-1. Import the JSON workflow file (`My_workflow_3.json`) into your n8n instance.
-2. Configure your OpenAI API credentials in n8n.
-3. Activate the workflow.
-4. Use the provided webhook URL to connect to your chat interface.
+1. **Trigger**: Activated via webhook when a user sends a chat message.
+2. **Sentiment Detection**: Analyzes emotional tone (positive, neutral, negative).
+3. **System Prompt Generation**: Builds a structured instruction for the AI agent based on sentiment.
+4. **Response Generation**: AI agent returns a well-structured, emotionally aligned reply.
+5. *(Optional)*: Memory module stores context for future expansion (currently not used in loops).
 
-## Credentials Configuration
+---
 
-> **IMPORTANT**: The workflow JSON file contains placeholder credentials that must be replaced with your own:
->
-> - **OpenAI API**: You will need to replace the credential references in the OpenAI Chat Model nodes with your own API key.
->   - Look for the credential sections in the JSON:
->     ```
->     "credentials": {
->       "openAiApi": {
->         "id": "YOUR_CREDENTIAL_ID_HERE",
->         "name": "YOUR_ACCOUNT_NAME_HERE"
->       }
->     }
->     ```
->   - Either configure these credentials in your n8n instance before importing, or update them after import.
->
-> - **Instance ID**: The workflow also contains a unique instance identifier that should be removed or will be automatically generated when imported into your n8n instance.
+## 🚀 Installation
 
-## Use Cases
+```bash
+# Step 1: Import the workflow into n8n
+Upload the file `My_workflow_3.json` to your n8n instance.
 
-- Customer service chatbots that adapt tone based on customer sentiment
-- Educational assistants that adjust teaching style to student frustration or excitement
-- Entertainment bots that match user enthusiasm or provide support when needed
-- Therapeutic conversation partners that recognize emotional states
+# Step 2: Configure OpenAI credentials
+Go to your n8n credentials and add your API key with GPT-4o access.
 
-## Customization
+# Step 3: Activate the workflow
+Enable the webhook trigger to start receiving messages.
 
-You can modify the system messages in the "Edit Fields" node to change how the agent responds to different sentiments. The current configuration uses colloquial Spanish expressions for a street-smart style, but this can be adapted to any language or tone.
+# Step 4: Connect your frontend or external service
+Use the webhook URL provided to connect a chat UI, form, or integration.
+```
 
-## Limitations
+---
 
-- Sentiment analysis accuracy depends on the quality of the language model
-- Response style is limited to three categories (could be expanded)
-- Currently optimized for Spanish language conversations
+## 🔐 Credentials
 
-## License
+Before using the workflow, update the following:
 
-[Include your license information here] 
+- **OpenAI API Key**: Replace the placeholder credentials in the workflow JSON with your own.
+- **Webhook Access**: Ensure the trigger node is publicly accessible or protected as needed.
+
+```json
+"credentials": {
+  "openAiApi": {
+    "id": "YOUR_CREDENTIAL_ID",
+    "name": "YOUR_ACCOUNT_NAME"
+  }
+}
+```
+
+---
+
+## 📌 Use Cases
+
+- Customer service tools that adjust tone based on emotional input  
+- Educational platforms that identify student frustration or motivation  
+- Therapy apps that offer support or reflection based on mood  
+- Human-computer interaction demos for sentiment-aware systems
+
+---
+
+## ⚙️ Customization
+
+You can modify:
+- 🎭 **Tone and language style** in the `Edit Fields` node
+- 🧠 **Prompt template** to change formatting or content emphasis
+- 🌐 **Language adaptation** to English, Spanish, or multilingual use
+
+---
+
+## 🚫 Limitations
+
+- Currently handles only 3 sentiment types (positive, neutral, negative)
+- Response quality depends on OpenAI's interpretation accuracy
+- Not a conversation bot — does not handle multi-turn interactions
+
+---
+
+## 📄 License
+
+[MIT License](LICENSE)
+
+---
+
+## 🙏 Acknowledgements
+
+- [n8n](https://n8n.io/) for the visual automation platform  
+- [OpenAI](https://openai.com/) for language models  
+- [LangChain](https://www.langchain.com/) for seamless model chaining  
+- The open-source community for continued inspiration
