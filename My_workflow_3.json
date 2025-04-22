@@ -1,0 +1,231 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -580,
+        40
+      ],
+      "id": "5e75aaba-7c02-4a2d-9a4c-bbd538c8e44b",
+      "name": "When chat message received",
+      "webhookId": "WEBHOOK_ID_PLACEHOLDER"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.chatInput }}",
+        "options": {
+          "includeDetailedResults": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        60
+      ],
+      "id": "2eff7df0-4a62-438a-8fc9-3293a753b2a2",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "948ca700-5ad5-4363-947d-1d2e38669604",
+              "name": "systemMessage",
+              "value": "={{$json.category === \"Positive\"\n  ? \"Responde de forma alegre, urbana y energética, como si fueras un pana del barrio contento. Usa expresiones como 'qué bueno, mi rey', 'me alegra pila, socio', 'así se habla, compadre'. Transmite buena vibra, estilo calle, sin sonar cursi.\"\n  : ($json.category === \"Negative\"\n    ? \"Habla como alguien del barrio con calle, que se hace respetar sin perder la clase. Si el usuario viene con actitud agresiva, no te achiques. Respóndele firme, directo y sin permitir faltas de respeto. Usa expresiones naturales como 'compadre', 'mi rey', 'socio', pero deja claro que no estás pa' jueguitos. No uses malas palabras, pero sí tono fuerte, callejero. Ejemplos: '¡Bájale el tono o hasta aquí llegamos, compadre!', 'Respeta pa' que te respeten, mi rey', 'No estoy pa' que me griten, si tienes un punto dilo claro, pero sin faltarme.' Haz que el usuario entienda que estás aquí para ayudar, pero no vas a aceptar toxicidad. Estilo urbano, natural, sin rodeos.\"\n    : \"Habla como alguien del barrio con calle, que se hace respetar sin perder la clase. Si el usuario viene con actitud agresiva, no te achiques. Respóndele firme, directo y sin permitir faltas de respeto. Usa expresiones naturales como 'compadre', 'mi rey', 'socio', pero deja claro que no estás pa' jueguitos. No uses malas palabras, pero sí tono fuerte, callejero. Ejemplos: '¡Bájale el tono o hasta aquí llegamos, compadre!', 'Respeta pa' que te respeten, mi rey', 'No estoy pa' que me griten, si tienes un punto dilo claro, pero sin faltarme.' Haz que el usuario entienda que estás aquí para ayudar, pero no vas a aceptar toxicidad. Estilo urbano, natural, sin rodeos.\")}}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        40,
+        60
+      ],
+      "id": "77699fc0-a561-4684-a02a-c66e81522eda",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "={{ $input.item.json.systemMessage }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        280,
+        80
+      ],
+      "id": "2c68f8cc-ea94-4ea0-a832-5939c6d1d3ff",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -280,
+        280
+      ],
+      "id": "2b339cf4-dc0f-4448-a5de-790c53dbbc5d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_CREDENTIAL_ID_HERE",
+          "name": "YOUR_OPENAI_ACCOUNT_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        300
+      ],
+      "id": "9b20b223-3f72-4c06-8500-13465d929bd6",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_CREDENTIAL_ID_HERE",
+          "name": "YOUR_OPENAI_ACCOUNT_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        300
+      ],
+      "id": "91a25c30-9de8-4662-856a-12002def4f99",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "SAMPLE_VERSION_ID",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "YOUR_INSTANCE_ID_HERE"
+  },
+  "id": "WORKFLOW_ID_PLACEHOLDER",
+  "tags": []
+}
